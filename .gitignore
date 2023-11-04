@@ -1,6 +1,10 @@
-validation_sets.xlsx
-private.pem
-ChemTastesDB_database.xlsx
+rdkit_practice.ipynb
+.ipynb_checkpoints/
+bitterness.csv
+structural_info.ipynb
+bitterness_notnull.csv
+requirements.txt
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
