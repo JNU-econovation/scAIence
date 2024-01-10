@@ -1,0 +1,66 @@
+\documentclass[9pt]{ieeeconf}
+
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{kotex}
+\usepackage{cite}
+
+
+% \hypersetup{
+%     colorlinks=true,   
+%     urlcolor=blue,
+% }
+
+\setcounter{secnumdepth}{4}
+
+\renewcommand{\baselinestretch}{1.3}
+
+
+\begin{document}
+
+\title{ClusterAttentiveFP 기반 화합물의 쓴맛 예측\\
+        \large Predict Bitterness of Compound using ClusterAttentiveFP}
+
+\author{Gunhyeong Kim$^{1}$, Chaewon Kim$^{2}$}
+\maketitle
+    \begin{abstract}
+        본 논문에서는 ClusterAttentiveFP를 활용하여 화합물의 쓴맛을 예측하는 모델을 제안한다.
+    \end{abstract}
+    \begin{keywords}
+        ClusterAttentiveFP, 쓴맛, 화합물, attention machanism
+    \end{keywords}
+
+
+\section[short]{\Large {\textsc{Introduction}}}
+    
+\indent 동물은 독성 화합물을 섭취하지 않도록 선천적으로 쓴맛에 대하여 혐오감을 느끼도록 진화하였다.
+그러므로 약물이 쓴맛을 낼 경우, 환자의 불쾌감을 유발하여 복용 준수성을 저해할 수 있다\cite{dagan2017bitter}.
+특히 소아 환자에 대하여 복약 순응도 문제를 유발할 가능성이 크며\cite{bahia2018bitterness},
+실제로 소아과 의사의 90\% 이상이 약의 맛이 완치의 가장 큰 장애물이라고 답했다\cite{mennella2013bad}.
+더하여, 반려동물 보유 가구 수가 전체 가구 수의 25.7\% 에 달하면서, 반려동물의 약물 치료에 대한 관심이 커지고 있다.
+이에 따라 약물의 쓴맛이 반려동물의 복약 용이성에 미치는 영향 또한 연구 대상으로 남아있다.
+
+\indent 그러므로 약물의 쓴맛에 대한 연구는 약물 치료의 효과를 향상하는 데 매우 중요하다.
+약물의 쓴맛을 완화할 수 있다면, 소아 환자 또는 반려동물에 대한 복약 지도가 편리해질 것이다.
+
+\indent TAS2R38는 2번 맛 수용체 38호를 결정하는 단백질 생성 유전자이다.
+2번 맛 수용체 3호는 입과 소화기관 내에서 쓴맛을 인지하고 구분해내는데, 이 유전자는 인간뿐만 아니라 반려동물로 가장 많이 고려되는 종인 개와 고양이에도 존재한다.
+그러므로 사람을 대상으로 충분한 연구가 선행된다면 반려동물로의 확장 또한 가능하리라 생각된다.
+
+\indent 기존의 이러한 연구는 대부분 \textit{in vivo}, \textit{in vitro} 환경에서 진행되어 비용 소모가 컸다.
+이를 \textit{in silico} 환경에서 인공지능 모델을 사용하여 예측할 수 있다면 비용 절감 및 실험의 윤리성과 안전성을 확보할 수 있을 것이다.
+
+\section[short]{\Large {\textsc{Materials and Methods}}}
+\subsection[short]{\large {Data sets}}
+화합물의 맛 정보(단맛, 쓴맛, 짠맛, 신맛, 감칠맛, 무맛 등)가 정리되어 있는 ChemTastesDB\cite{rojas2022chemtastesdb}를 데이터 셋(data set)으로 활용하였다. 쓴맛을 나타내는 화합물을 1, 그 외 단맛, 짠맛, 신맛, 감칠맛, 무맛 등 다섯 가지 미각을 나타내는 화합물을 0으로 라벨링(labeling)하였다. 
+ChemTastesDB에는 화합물의 맛 정보 이외에도 분자 구조를 문자열로 표기한 canonical SMILES 정보가 존재한다. RDkit이 제공하는 모듈을 활용하여 이 canonical SMILES 표기로부터 먼저 분자 객체(moleculer object)를 추출한 다음, 분자의 구조적 정보와 물리‧화학적 정보를 추출하였다. 
+
+
+
+
+% \section[short]{\Large {\textsc{References}}}
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv, ref}
+
+\end{document}
+
