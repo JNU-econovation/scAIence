@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{kotex}
 \usepackage{cite}
+\usepackage{graphicx}
 
 
 % \hypersetup{
@@ -19,20 +20,20 @@
 \begin{document}
 
 \title{ClusterAttentiveFP 기반 화합물의 쓴맛 예측\\
-        \large Predict Bitterness of Compound using ClusterAttentiveFP}
+    \large Predict Bitterness of Compound using ClusterAttentiveFP}
 
 \author{Gunhyeong Kim$^{1}$, Chaewon Kim$^{2}$}
 \maketitle
-    \begin{abstract}
-        본 논문에서는 ClusterAttentiveFP를 활용하여 화합물의 쓴맛을 예측하는 모델을 제안한다.
-    \end{abstract}
-    \begin{keywords}
-        ClusterAttentiveFP, 쓴맛, 화합물, attention machanism
-    \end{keywords}
+\begin{abstract}
+    본 논문에서는 ClusterAttentiveFP를 활용하여 화합물의 쓴맛을 예측하는 모델을 제안한다.
+\end{abstract}
+\begin{keywords}
+    ClusterAttentiveFP, 쓴맛, 화합물, attention machanism
+\end{keywords}
 
 
 \section[short]{\Large {\textsc{Introduction}}}
-    
+
 \indent 동물은 독성 화합물을 섭취하지 않도록 선천적으로 쓴맛에 대하여 혐오감을 느끼도록 진화하였다.
 그러므로 약물이 쓴맛을 낼 경우, 환자의 불쾌감을 유발하여 복용 준수성을 저해할 수 있다\cite{dagan2017bitter}.
 특히 소아 환자에 대하여 복약 순응도 문제를 유발할 가능성이 크며\cite{bahia2018bitterness},
@@ -52,9 +53,24 @@
 
 \section[short]{\Large {\textsc{Materials and Methods}}}
 \subsection[short]{\large {Data sets}}
-화합물의 맛 정보(단맛, 쓴맛, 짠맛, 신맛, 감칠맛, 무맛 등)가 정리되어 있는 ChemTastesDB\cite{rojas2022chemtastesdb}를 데이터 셋(data set)으로 활용하였다. 쓴맛을 나타내는 화합물을 1, 그 외 단맛, 짠맛, 신맛, 감칠맛, 무맛 등 다섯 가지 미각을 나타내는 화합물을 0으로 라벨링(labeling)하였다. 
-ChemTastesDB에는 화합물의 맛 정보 이외에도 분자 구조를 문자열로 표기한 canonical SMILES 정보가 존재한다. RDkit이 제공하는 모듈을 활용하여 이 canonical SMILES 표기로부터 먼저 분자 객체(moleculer object)를 추출한 다음, 분자의 구조적 정보와 물리‧화학적 정보를 추출하였다. 
+화합물의 맛 정보(단맛, 쓴맛, 짠맛, 신맛, 감칠맛, 무맛 등)가 정리되어 있는 ChemTastesDB\cite{rojas2022chemtastesdb}를 데이터 셋(data set)으로 활용하였다. 쓴맛을 나타내는 화합물을 1, 그 외 단맛, 짠맛, 신맛, 감칠맛, 무맛 등 다섯 가지 미각을 나타내는 화합물을 0으로 라벨링(labeling)하였다.
+ChemTastesDB에는 화합물의 맛 정보 이외에도 분자 구조를 문자열로 표기한 canonical SMILES 정보가 존재한다. RDkit이 제공하는 모듈을 활용하여 이 canonical SMILES 표기로부터 먼저 분자 객체(moleculer object)를 추출한 다음, 분자의 구조적 정보와 물리‧화학적 정보를 추출하였다.
 
+\section[short]{\Large {\textsc{Background}}}
+\subsection[short]{\large {Graph}}
+\indent 그래프란 자료구조의 종류 중 하나로, 정점(node)와 그 정점을 연결하는 간선(edge)으로 구성되어 있다.
+그렇기 때문에 연결되어 있는 객체 간의 관계를 표현할 수 있다. 그래프는 이러한 특징을 통해 뇌를 구성하는 뉴런 간의 연결성, 지식 그래프(knowledge graph), 화학 분자, 단백질 상호작용 등을 표현하는 데 적합하다.
+그러므로 이러한 그래프를 잘 분석할 수 있다면 신약 개발 등의 생화학적 분야 뿐만 아니라 인공지능 개발 등의 공학 분야에 큰 기여를 할 수 있을 것이다.
+
+\indent 그래프에는 다음과 같은 다양한 특징들이 존재한다. 첫째, 방향(directed)과 양방향(undirected), 둘째, 사이클 혹은 루프가 존재 할 수 있으며 자체 간선(self-roop) 또한 가능하다.
+셋째, 루트 정점(root node) 또는 부모-자식 정점의 개념이 존재하지 않는다.
+
+\indent 그래프는 주로 인접행렬(adjacency matrix) 또는 인접리스트(adjacency list)로 표현된다. 정점의 개수가 n개일 때 인접행렬의 크기는 $n \times n$이며, 인접리스트의 크기는 $n$이다. 인접행렬은 정점 간의 연결 관계를 행렬로 표현한 것이다. 인접리스트는 정점의 개수만큼 리스트를 만들고, 각 리스트에는 해당 정점과 연결된 정점들을 저장한다.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./images/adjacency_matrix.png}
+    \caption{그래프와 인접행렬의 예시}
+\end{figure}
 
 
 
