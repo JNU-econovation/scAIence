@@ -114,7 +114,7 @@ def make_fp_df(mols, vec_len):
         mol_sen = MolSentence(mol2alt_sentence(mol, 1))
         mol_vec = sentences2vec(model, mol_sen, vec_len=vec_len, unseen=None)
         # fp_df = fp_df.append({'sentence': mol_sen, 'mol2vec': mol_vec}, ignore_index=True)
-        fp_df = fp_df.append({'sentence': mol_sen}, ignore_index=True)
+        fp_df = pd.concat([fp_df, pd.DataFrame.from_dict({'sentence': mol_sen}, orient='index')], ignore_index=True)
         # print(mol_vec)
         # raise
         # # add mol2vec to fp_df2
