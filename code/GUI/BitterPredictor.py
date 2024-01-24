@@ -40,6 +40,16 @@ loding_img = imagePrepro("./images/loading.gif")
 img_frame = tk.Label(page1, width=IMG_SIZE[0], height=IMG_SIZE[1]+100, image=logo_img)
 img_frame.pack(side="top", anchor="center")
 
+notice_frame = tk.LabelFrame(page1, width=IMG_SIZE[0], height=10, borderwidth=0)
+notice_frame.pack(side="bottom", anchor="center")
+
+text = tk.Text(notice_frame, width=IMG_SIZE[0], height=4, font=("Pretendard", 15, "bold"), borderwidth=0, pady=10)
+text.insert(1.0, "Press Any key\n")
+text.tag_configure("center", justify='center')
+text.tag_add("center", 1.0, "end")
+text.pack(side="top", anchor="center")   
+
+
 
 def startAction(event):
     s = start_input.get().replace(" ", "")
@@ -48,7 +58,7 @@ def startAction(event):
     page2.pack(side="top", anchor="center")
 
 
-start_input = tk.Entry(page1)
+start_input = tk.Entry(notice_frame)
 start_input.bind("<Return>", startAction)
 start_input.pack(side="bottom", anchor="center")
 
@@ -62,7 +72,7 @@ img_frame = tk.Label(img_box, width=IMG_SIZE[0], height=IMG_SIZE[1]+100, image=l
 img_frame.pack(side="top", anchor="center")
 
 examples = tk.Text(img_box, height=4, font=("Pretendard", 10, "bold"), borderwidth=0, pady=10)
-examples.insert(1.0, "Caffeine, Aspartame, Sucrose, Glucose, Fructose, Ethanol, Acetic acid, Sodium chloride\n")
+examples.insert(1.0, "Caffeine, Sucrose, Glucose, Fructose, Ethanol, Acetic acid\n")
 examples.insert(1.0, "Examples\n")
 examples.tag_configure("center", justify='center')
 examples.tag_add("center", 1.0, "end")
