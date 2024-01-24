@@ -58,31 +58,42 @@ page2 = tk.Frame(window, width=700, height=700)
 img_box = tk.LabelFrame(page2, width=IMG_SIZE[0], height=IMG_SIZE[1]+100, borderwidth=0)
 img_box.pack(side="top", anchor="center")
 
-
-
 img_frame = tk.Label(img_box, width=IMG_SIZE[0], height=IMG_SIZE[1]+100, image=logo_img)
 img_frame.pack(side="top", anchor="center")
 
-img_caption = tk.Label(img_box, text="분자 이름", font=("Helvetica", 20))
+examples = tk.Text(img_box, height=4, font=("Pretendard", 10, "bold"), borderwidth=0, pady=10)
+examples.insert(1.0, "Caffeine, Aspartame, Sucrose, Glucose, Fructose, Ethanol, Acetic acid, Sodium chloride\n")
+examples.insert(1.0, "Examples\n")
+examples.tag_configure("center", justify='center')
+examples.tag_add("center", 1.0, "end")
+examples.pack(side="bottom", anchor="center")   
+
+examples.configure(bg=img_box.cget('bg'),  font=("Pretendard", 10, "bold"), state="disabled")
+
+img_caption = tk.Label(img_box, text="화합물 이름 또는 canonical SMILES를 입력하세요", font=("Pretendard", 15, "bold"))
 img_caption.pack(side="bottom", anchor="center")
 
 
-
-
 def isBitterSMILES(event):
-    smiles = entry.get()
+    input = entry.get()
 
-    img_frame.configure(image=loding_img)
+    img_frame.configure(image=loding_img, width=IMG_SIZE[0], height=IMG_SIZE[1]+100)
 
     try:
+        # if input is the name of compound, convert it to SMILES
+        smiles = name_to_smiles(input)
         smiles = Chem.MolToSmiles(Chem.MolFromSmiles(smiles), isomericSmiles=True)
     except:
-        bitter_noti.configure(text="it's not SMILES")
-        entry.delete(0, len(entry.get()))
-        return
+        try:
+            # if input is SMILES, passthrough rdkit
+            smiles = Chem.MolToSmiles(Chem.MolFromSmiles(input), isomericSmiles=True)
+        except:
+            # if input is neither SMILES nor compound name, show error message
+            bitter_noti.configure(text="it's not SMILES or compound name")
+            entry.delete(0, len(entry.get()))
+            return
     
-    #TODO: smiles를 분자 이름으로 바꾸기
-    img_caption.configure(text=smiles)
+    img_caption.configure(text=input)
 
     kargs = {
         "cheminfo_input_dim": 58,
@@ -133,11 +144,11 @@ def isBitterSMILES(event):
     )
 
     if prediction[0][0] > 0.5:
-        result = "Bitter"
+        result = "BITTER"
     else:
-        result = "Not bitter"
+        result = "NOT BITTER"
 
-    bitter_noti.configure(text=result)
+    bitter_noti.configure(text=result, font=("Pretendard", 20))
 
     entry.delete(0, len(entry.get()))
 
@@ -155,17 +166,18 @@ def exit_program(window):
 
 
 bottom_box = tk.LabelFrame(page2, borderwidth=0)
-bottom_box.pack(side="bottom", anchor="center", pady=10)
+bottom_box.pack(side="bottom", anchor="center", pady=5)
 
 label_frame = tk.LabelFrame(bottom_box, borderwidth=0)
 label_frame.pack(side="top", anchor="center")
 
+
 entry = tk.Entry(label_frame)
 entry.bind("<Return>", isBitterSMILES)
-entry.pack(side="top", anchor="center")
+entry.pack(side="top", anchor="center", pady=5)
 
-bitter_noti = tk.Label(label_frame, text="canonical SMILES를 입력하세요", anchor="w")
+
+bitter_noti = tk.Label(label_frame, text="", anchor="w", font=("Pretendard", 20, "bold"))
 bitter_noti.pack(side="bottom", anchor="center")
-
 
 window.mainloop()
