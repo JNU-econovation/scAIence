@@ -75,7 +75,7 @@ def mol_image_gen(smiles, viz_arrs, path, **kwargs):
     plt_colors = cm.ScalarMappable(norm=norm, cmap=cmap)
     atom_colors = {}
     weight_norm = np.array(weight_norm).flatten()
-    threshold = weight_norm[np.argsort(weight_norm)[8]]
+    threshold = weight_norm[np.argsort(weight_norm)[-len(ind_atom)//3]]
     weight_norm = np.where(weight_norm < threshold, 0, weight_norm)
 
     for i in range(len(ind_atom)):
