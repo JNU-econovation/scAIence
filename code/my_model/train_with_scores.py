@@ -105,7 +105,7 @@ def train(model, dataset, optimizer, loss_function):
             x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info = param_list
 
             
-            _ , prediction = model(x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info)
+            _ , _ , prediction = model(x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info)
             
             model.zero_grad()
             loss = loss_function(prediction, torch.Tensor(y_val).view(-1,1).to(torch.device('cuda')))     
@@ -151,7 +151,7 @@ def eval(model, dataset):
             param_list[i] = torch.Tensor(param_list[i]).to(torch.device('cuda'))
         x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info = param_list
         
-        _ , prediction = model(x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info)
+        _ , _ , prediction = model(x_atom, x_bonds, x_atom_index, x_bond_index, x_mask, x_chemical_info)
         MAE = F.l1_loss(prediction, torch.Tensor(y_val).view(-1,1).to(torch.device('cuda')), reduction='none')        
         MSE = F.mse_loss(prediction, torch.Tensor(y_val).view(-1,1).to(torch.device('cuda')), reduction='none')
         CROSS_ENTROPY = F.binary_cross_entropy_with_logits(prediction, torch.Tensor(y_val).view(-1,1).to(torch.device('cuda')), reduction='none')

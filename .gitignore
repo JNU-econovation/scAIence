@@ -175,3 +175,5 @@ temps/
 
 *.pt
 *.pth
+
+*.DS_Store

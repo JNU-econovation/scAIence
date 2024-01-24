@@ -97,6 +97,9 @@ class MyModel(nn.Module):
         batch_size, mol_length, num_atom_feat = x_atom.size()
         atom_feature = F.leaky_relu(self.atom_fc(x_atom))
 
+        atom_feature_viz = []
+        atom_feature_viz.append(self.atom_fc(x_atom))
+
         if not has_gpu:
             x_bond_index = x_bond_index.type(torch.LongTensor)
             x_atom_index = x_atom_index.type(torch.LongTensor)
@@ -119,9 +122,9 @@ class MyModel(nn.Module):
         attend_mask[attend_mask == mol_length - 1] = 0
 
         if not has_gpu:
-                attend_mask = attend_mask.type(torch.FloatTensor).unsqueeze(-1)
+            attend_mask = attend_mask.type(torch.FloatTensor).unsqueeze(-1)
         else:
-                attend_mask = attend_mask.type(torch.cuda.FloatTensor).unsqueeze(-1)
+            attend_mask = attend_mask.type(torch.cuda.FloatTensor).unsqueeze(-1)
 
         softmax_mask = x_atom_index.clone()
         softmax_mask[softmax_mask != mol_length - 1] = 0
@@ -130,9 +133,9 @@ class MyModel(nn.Module):
         ] = -9e8  # make the softmax value extremly small
 
         if not has_gpu:
-                softmax_mask = softmax_mask.type(torch.FloatTensor).unsqueeze(-1)
+            softmax_mask = softmax_mask.type(torch.FloatTensor).unsqueeze(-1)
         else:
-                softmax_mask = softmax_mask.type(torch.cuda.FloatTensor).unsqueeze(-1)
+            softmax_mask = softmax_mask.type(torch.cuda.FloatTensor).unsqueeze(-1)
 
         (
             batch_size,
@@ -152,6 +155,10 @@ class MyModel(nn.Module):
         #             print(attention_weight)
         attention_weight = attention_weight * attend_mask
         #         print(attention_weight)
+
+        atom_attention_weight_viz = []
+        atom_attention_weight_viz.append(attention_weight)
+
         neighbor_feature_transform = self.attend[0](self.dropout(neighbor_feature))
         #             print(features_neighbor_transform.shape)
         context = torch.sum(torch.mul(attention_weight, neighbor_feature_transform), -2)
@@ -168,6 +175,7 @@ class MyModel(nn.Module):
 
         # do nonlinearity
         activated_features = F.relu(atom_feature)
+        atom_feature_viz.append(activated_features)
 
         for d in range(self.radius - 1):
             # bonds_indexed = [x_bond[i][torch.cuda.LongTensor(x_bond_index)[i]] for i in range(batch_size)]
@@ -190,6 +198,7 @@ class MyModel(nn.Module):
             #             print(attention_weight)
             attention_weight = attention_weight * attend_mask
             #             print(attention_weight)
+            atom_attention_weight_viz.append(attention_weight)
             neighbor_feature_transform = self.attend[d + 1](
                 self.dropout(neighbor_feature)
             )
@@ -210,19 +219,27 @@ class MyModel(nn.Module):
 
             # do nonlinearity
             activated_features = F.relu(atom_feature)
+            atom_feature_viz.append(activated_features)
+
+        mol_feature_unbounded_viz = []
+        mol_feature_unbounded_viz.append(torch.sum(atom_feature * x_mask, dim=-2))
 
         mol_feature = torch.sum(activated_features * x_mask, dim=-2)
 
         activated_features_mol = F.relu(mol_feature)
 
+        mol_feature_viz = []
+        mol_feature_viz.append(mol_feature)
+
+        mol_attention_weight_viz = []
         mol_softmax_mask = x_mask.clone()
         mol_softmax_mask[mol_softmax_mask == 0] = -9e8
         mol_softmax_mask[mol_softmax_mask == 1] = 0
 
         if not has_gpu:
-                mol_softmax_mask = mol_softmax_mask.type(torch.FloatTensor)
+            mol_softmax_mask = mol_softmax_mask.type(torch.FloatTensor)
         else:
-                mol_softmax_mask = mol_softmax_mask.type(torch.cuda.FloatTensor)
+            mol_softmax_mask = mol_softmax_mask.type(torch.cuda.FloatTensor)
 
         for t in range(self.T):
             mol_prediction_expand = activated_features_mol.unsqueeze(-2).expand(
@@ -234,6 +251,8 @@ class MyModel(nn.Module):
             mol_attention_weight = F.softmax(mol_align_score, -2)
             mol_attention_weight = mol_attention_weight * x_mask
             #             print(mol_attention_weight.shape,mol_attention_weight)
+            mol_attention_weight_viz.append(mol_attention_weight)
+
             activated_features_transform = self.mol_attend(
                 self.dropout(activated_features)
             )
@@ -247,8 +266,10 @@ class MyModel(nn.Module):
             mol_feature = self.mol_GRUCell(mol_context, mol_feature)
             #             print(mol_feature.shape,mol_feature)
 
+            mol_feature_unbounded_viz.append(mol_feature)
             # do nonlinearity
             activated_features_mol = F.relu(mol_feature)
+            mol_feature_viz.append(activated_features_mol)
 
         mol_prediction = self.mol_output(self.dropout(mol_feature))
 
@@ -279,7 +300,17 @@ class MyModel(nn.Module):
         x = self.output(x)
         y = self.sigmoid(x)
 
-        return x, y
+        return (
+            (
+                atom_feature_viz,
+                atom_attention_weight_viz,
+                mol_feature_viz,
+                mol_feature_unbounded_viz,
+                mol_attention_weight_viz,
+            ),
+            x,
+            y,
+        )
 
 
 class AttentiveFP(nn.Module):
