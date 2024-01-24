@@ -173,3 +173,5 @@ cython_debug/
 
 temps/
 
+*.pt
+*.pth
