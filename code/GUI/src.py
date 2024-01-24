@@ -1,4 +1,7 @@
 from PIL import ImageTk, Image
+import requests
+import pubchempy as pcp
+
 
 IMG_SIZE = (400, 400)
 
@@ -35,3 +38,20 @@ def imagePrepro_img(img):
 
 def exit_program(window):
     window.destroy()
+
+
+def name_to_smiles(name):
+    c = pcp.get_compounds(name, 'name')
+    try:
+        return c[0].canonical_smiles
+    except:
+        return False
+    
+
+def smiles_to_name(smiles):
+    c = pcp.get_compounds(smiles, 'smiles')
+    try:
+        c = pcp.get_compounds(c[0].synonyms[0], 'name')
+        return c[0].synonyms[0]
+    except:
+        return False
