@@ -104,10 +104,19 @@ SMILES는 ASCII 문자로 표현되기 때문에 다른 표기법에 비해 간�
     \item 결합의 방향: 결합의 방향이 고정된다.
 \end{enumerate}
 
-\subsection[short]{\large {Fingerprint}}
-Fingerprint는 분자의 구조적 특징을 나타내는 숫자 또는 문자열이다. 분자를 고유하게 식별하고, 유사성을 측정하는 데 사용된다. 또한, 분자 그래프의 정점 특징 벡터로써 사용되기도 한다. 
-하단 그림처럼 어떤 원자로부터 일정한 거리에 있는 원자들을 분석하고 그 평균을 구하여 수치로 나타낼 수 있다. 
-이 값들은 길이가 정해진 2진수에 할당된다.
+\subsection[short]{\large {Morgan Fingerprint}}
+Fingerprint는 분자의 구조적 특징을 나타내는 정수값으로, 분자를 고유하게 식별하고 유사성을 측정하는 데 사용된다. 
+또한, 분자 그래프의 정점 특징 벡터로써 사용되기도 한다. 
+Fig. 2.와 같이 어떤 목표 원자로부터 일정한 거리에 있는 원자들을 분석하여 식별자를 부여하고,
+이 식별자들에 hash function을 적용하여 이진수 값을 얻을 수 있다. 
+이때 hash function으로 morgan algorithm을 사용하면 Morgan fingerprint를 얻을 수 있다. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./images/mf.png}
+    \includegraphics[width=0.5\textwidth]{./images/mf_hash.png}
+    \caption{Morgan fingerprint 생성 과정}
+\end{figure}
+
  
 % \section[short]{\Large {\textsc{References}}}
 \bibliographystyle{IEEEtran}
