@@ -4,6 +4,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 sys.path.append("../my_model/")
 
 from mymodel import MyModel
+from mol_visualization import mol_image_gen
 from chemical_info.chem_features_pipeline import total_chem_array
 from AttentiveFP.getFeatures_aromaticity_rm import get_smiles_dicts, get_smiles_array
 
@@ -121,7 +122,7 @@ def isBitterSMILES(event):
 
     model.eval()
 
-    _, prediction = model(
+    viz_arrs, _, prediction = model(
         x_atom,
         x_bonds,
         x_atom_index,
@@ -140,8 +141,9 @@ def isBitterSMILES(event):
 
     entry.delete(0, len(entry.get()))
 
-    mol_img = Draw.MolToImage(Chem.MolFromSmiles(smiles))
-    mol_img.save("./images/temp_img.png")
+    # mol_img = Draw.MolToImage(Chem.MolFromSmiles(smiles))
+    # mol_img.save("./images/temp_img.png")
+    mol_image_gen(smiles, viz_arrs, "./images/temp_img.png", **kargs)
     mol_img = imagePrepro("./images/temp_img.png")
     img_frame.image = mol_img
 
