@@ -43,10 +43,7 @@ img_frame.pack(side="top", anchor="center")
 notice_frame = tk.LabelFrame(page1, width=IMG_SIZE[0], height=10, borderwidth=0)
 notice_frame.pack(side="bottom", anchor="center")
 
-text = tk.Text(notice_frame, width=IMG_SIZE[0], height=4, font=("Pretendard", 15, "bold"), borderwidth=0, pady=10)
-text.insert(1.0, "Press Any key\n")
-text.tag_configure("center", justify='center')
-text.tag_add("center", 1.0, "end")
+text = tk.Label(notice_frame, text="Press Any key", width=IMG_SIZE[0], height=4, font=("Pretendard", 15, "bold"), borderwidth=0, pady=10)
 text.pack(side="top", anchor="center")   
 
 
@@ -162,8 +159,6 @@ def isBitterSMILES(event):
 
     entry.delete(0, len(entry.get()))
 
-    # mol_img = Draw.MolToImage(Chem.MolFromSmiles(smiles))
-    # mol_img.save("./images/temp_img.png")
     mol_image_gen(smiles, viz_arrs, "./images/temp_img.png", **kargs)
     mol_img = imagePrepro("./images/temp_img.png")
     img_frame.image = mol_img
